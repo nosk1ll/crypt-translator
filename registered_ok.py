@@ -1,0 +1,40 @@
+import tkinter as tk
+
+
+class registered_ok:
+    def __init__(self, username):
+        self.username = username
+        self.root = tk.Tk()
+        self.root.geometry("500x150")
+        indent = 10
+
+        self.label_info = tk.Label(
+            self.root,
+            text="Your account has been created with username:",
+            wraplength=380,
+            justify="left",
+        )
+        self.textbox_username = tk.Entry(self.root, width=77)
+        self.textbox_username.insert(0, username)
+        self.button_copy = tk.Button(
+            self.root,
+            text="Copy",
+            width=17,
+            command=lambda: (
+                self.root.clipboard_clear(),
+                self.root.clipboard_append(self.textbox_username.get()),
+            ),
+        )
+        self.button_ok = tk.Button(self.root, text="Ok", width=17, command=self.button_ok_click)
+
+        self.label_info.place(x=indent, y=15)
+        self.textbox_username.place(x=indent, y=55)
+        self.button_copy.place(x=indent, y=95)
+        self.button_ok.place(x=150, y=95)
+
+        self.root.mainloop()
+
+    def button_ok_click(self):
+        self.root.destroy()
+        from login_view import login_view
+        login_view()
