@@ -1,0 +1,47 @@
+import os
+import tkinter as tk
+from importlib.machinery import SourceFileLoader
+from AccountManager import AccountManager
+
+registered_ok = SourceFileLoader(
+    "registered_ok",
+    os.path.join(os.path.dirname(__file__), "registered_ok.view"),
+).load_module().registered_ok
+
+
+class register_view:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.geometry("300x220")
+        indent = 10
+
+        self.label_info = tk.Label(
+            self.root,
+            text="Enter your password below and your username will automatically be created",
+            wraplength=250,
+            justify="left",
+        )
+        self.textbox_password = tk.Entry(self.root, width=40, show="*")
+        self.label_confirm = tk.Label(self.root, text="confirm your password")
+        self.textbox_confirm = tk.Entry(self.root, width=40, show="*")
+        self.button_create = tk.Button(self.root, text="create account", command=self.button_create_click)
+        self.label_wrong = tk.Label(self.root,text="",fg="red")
+
+        self.label_info.place(x=indent, y=10)
+        self.textbox_password.place(x=indent, y=50)
+        self.label_confirm.place(x=indent, y=80)
+        self.textbox_confirm.place(x=indent, y=110)
+        self.button_create.place(x=indent, y=140)
+        self.label_wrong.place(x=indent,y=180)
+
+        self.root.mainloop()
+
+    def button_create_click(self):
+        if self.textbox_password.get()==self.textbox_confirm.get():
+            am = AccountManager()
+            password=self.textbox_password.get()
+            username=am.get_public_key(password)
+            self.root.destroy()
+            registered_ok(username)
+        else:
+            self.label_wrong.config(text="Passwords do not match")

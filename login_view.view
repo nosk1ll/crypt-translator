@@ -1,16 +1,29 @@
+import os
 import tkinter as tk
+from importlib.machinery import SourceFileLoader
+from AccountManager import AccountManager
+from PrivateKeyPublicKeyCipher import PrivateKeyPublicKeyCipher
 
+register_view = SourceFileLoader(
+    "register_view",
+    os.path.join(os.path.dirname(__file__), "register_view.view"),
+).load_module().register_view
+
+translator_view = SourceFileLoader(
+    "translator_view",
+    os.path.join(os.path.dirname(__file__), "translator_view.view"),
+).load_module().translator_view
 
 class login_view:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.geometry("300x170")
+        self.root.geometry("370x200")
         indent = 10
 
         self.label_username = tk.Label(self.root, text="username:", width=10, anchor="w")
         self.label_password = tk.Label(self.root, text="password:", width=10, anchor="w")
         self.textbox_username = tk.Entry(self.root, width=30)
-        self.textbox_password = tk.Entry(self.root, width=30)
+        self.textbox_password = tk.Entry(self.root, width=30, show="*")
 
         self.label_username.place(x=indent, y=30)
         self.label_password.place(x=indent, y=70)
@@ -24,9 +37,44 @@ class login_view:
             y=self.label_password.winfo_y(),
         )
 
-        self.button_login = tk.Button(self.root, text="login", width=17, command=lambda: self.button_login.config(text="YOUR MOM"))
+        self.button_login = tk.Button(self.root, text="login", width=17, command=self.button_login_click)
         self.button_login.place(x=indent, y=110)
-        self.button_register = tk.Button(self.root, text="register", width=17, command=lambda: self.button_register.config(text="YOUR MOM"))
+        self.button_register = tk.Button(self.root, text="register", width=17, command=self.button_register_click)
         self.button_register.place(x=150, y=110)
+        self.button_username_paste = tk.Button(
+            self.root,
+            text="paste",
+            width=5,
+            pady=0,
+            command=lambda: (
+                self.textbox_username.delete(0, tk.END),
+                self.textbox_username.insert(0, self.root.clipboard_get()),
+            ),
+        )
+        self.root.update_idletasks()
+        self.button_username_paste.place(
+            x=300,
+            y=self.textbox_username.winfo_y(),
+            height=self.textbox_username.winfo_height()+2,
+        )
+
+        self.label_wrong = tk.Label(self.root, text="", fg="red")
+        self.label_wrong.place(x=indent, y=155)
 
         self.root.mainloop()
+
+    def button_login_click(self):
+        am = AccountManager()
+        password=self.textbox_password.get()
+        username=self.textbox_username.get()
+        if am.get_public_key(password)==username:
+            private_key=am.get_private_key(password)
+            public_key=username
+            self.root.destroy()
+            translator_view(private_key, public_key)
+        else:
+            self.label_wrong.config(text="Incorrect username and password.")
+
+    def button_register_click(self):
+        self.root.destroy()
+        register_view()
