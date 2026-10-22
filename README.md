@@ -4,7 +4,11 @@ An offline messenger that encodes and decodes private messages.
 
 
 
-To use, enter the following command in the terminal/command prompt:
+To use, go to dist folder and run the .exe file.
+
+
+
+Alternatively, enter the following command in the terminal/command prompt:
 
 
 
