@@ -4,9 +4,9 @@ An offline messenger that encodes and decodes private messages.
 
 
 
-To use, run this command in the terminal:
+To use, install dependencies and run:
 
 
-
-python gui\_crypt\_translator.py
+pip install -r requirements.txt
+python gui_crypt_translator.py
 
