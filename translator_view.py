@@ -71,9 +71,9 @@ class translator_view:
         self._bind_text_events(self.textbox_decrypted, self.textbox_decrypted_change)
         btns4 = ctk.CTkFrame(body4, fg_color="transparent")
         btns4.pack(side="left", padx=(gap, 0), anchor="n")
-        self.button_dec_cut = self._clip_button(btns4, "Cut", lambda: self._text_cut(self.textbox_decrypted))
-        self.button_dec_copy = self._clip_button(btns4, "Copy", lambda: self._text_copy(self.textbox_decrypted), pady=3)
-        self.button_dec_paste = self._clip_button(btns4, "Paste", lambda: self._text_paste(self.textbox_decrypted))
+        self.button_dec_cut = self._clip_button(btns4, "cut", lambda: self._text_cut(self.textbox_decrypted))
+        self.button_dec_paste = self._clip_button(btns4, "paste", lambda: self._text_paste(self.textbox_decrypted), pady=3)
+        self.button_dec_delete = self._clip_button(btns4, "delete", lambda: self._text_delete(self.textbox_decrypted))
 
         row5 = ctk.CTkFrame(work, fg_color="transparent")
         row5.pack(anchor="w", fill="both", expand=True, padx=side, pady=(6, 12))
@@ -92,9 +92,9 @@ class translator_view:
         self._bind_text_events(self.textbox_encrypted, self.textbox_encrypted_change)
         btns5 = ctk.CTkFrame(body5, fg_color="transparent")
         btns5.pack(side="left", padx=(gap, 0), anchor="n")
-        self.button_enc_cut = self._clip_button(btns5, "Cut", lambda: self._text_cut(self.textbox_encrypted))
-        self.button_enc_copy = self._clip_button(btns5, "Copy", lambda: self._text_copy(self.textbox_encrypted), pady=3)
-        self.button_enc_paste = self._clip_button(btns5, "Paste", lambda: self._text_paste(self.textbox_encrypted))
+        self.button_enc_cut = self._clip_button(btns5, "cut", lambda: self._text_cut(self.textbox_encrypted))
+        self.button_enc_paste = self._clip_button(btns5, "paste", lambda: self._text_paste(self.textbox_encrypted), pady=3)
+        self.button_enc_delete = self._clip_button(btns5, "delete", lambda: self._text_delete(self.textbox_encrypted))
 
         if run_loop:
             self.root.mainloop()
@@ -155,25 +155,12 @@ class translator_view:
             return True
         return False
 
-    def _text_copy(self, widget):
-        inner=self._inner(widget)
-        try:
-            text=inner.get("sel.first", "sel.last")
-        except tk.TclError:
-            text=inner.get("1.0", "end-1c")
-        self.root.clipboard_clear()
-        self.root.clipboard_append(text)
-
     def _text_cut(self, widget):
         inner=self._inner(widget)
-        try:
-            text=inner.get("sel.first", "sel.last")
-            inner.delete("sel.first", "sel.last")
-        except tk.TclError:
-            text=inner.get("1.0", "end-1c")
-            inner.delete("1.0", "end")
+        text=inner.get("1.0", "end-1c")
         self.root.clipboard_clear()
         self.root.clipboard_append(text)
+        inner.delete("1.0", "end")
         self._sync_after_edit(widget)
 
     def _text_paste(self, widget):
@@ -182,11 +169,12 @@ class translator_view:
             clip=self.root.clipboard_get()
         except tk.TclError:
             return
-        try:
-            inner.delete("sel.first", "sel.last")
-        except tk.TclError:
-            pass
-        inner.insert("insert", clip)
+        inner.insert("end", clip)
+        self._sync_after_edit(widget)
+
+    def _text_delete(self, widget):
+        inner=self._inner(widget)
+        inner.delete("1.0", "end")
         self._sync_after_edit(widget)
 
     def _sync_after_edit(self, widget):
